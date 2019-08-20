@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            function newEl(tag){
+                return document.createElement(tag);
+            }
+
+            window.addEventListener('load', mInit, false);
+            
+            // rbgData - 3 bytes per pixel - alpha-channel data not used (or valid)
+            //
+            function createImageFromRGBdata(rgbData, width, height){
+                var mCanvas = newEl('canvas');
+                mCanvas.width = width;
+                mCanvas.height = height;
+
+                var mContext = mCanvas.getContext('2d');
+                var mImgData = mContext.createImageData(width, height);
+
+                var srcIndex=0, dstIndex=0, curPixelNum=0;
+
+                for (curPixelNum=0; curPixelNum<width*height;  curPixelNum++){
+                    mImgData.data[dstIndex] = rgbData[srcIndex];		// r
+                    mImgData.data[dstIndex+1] = rgbData[srcIndex+1];	// g
+                    mImgData.data[dstIndex+2] = rgbData[srcIndex+2];	// b
+                    mImgData.data[dstIndex+3] = 255; // 255 = 0xFF - constant alpha, 100% opaque
+                    srcIndex += 3;
+                    dstIndex += 4;
+                }
+                mContext.putImageData(mImgData, 0, 0);
+                return mCanvas;
+            }
+
+
+            var rgbData = new Array(
+                0xff,0xff,0xff,  0xff,0xff,0xff,  0xff,0xff,0xff,  0xff,0xff,0xff,// white,white,white, white
+                0xff,0xff,0xff,  0xff,0x00,0x00,  0x00,0xff,0x00,  0xff,0xff,0xff,// white,  red,green, white
+                0xff,0xff,0xff,  0x00,0x00,0xff,  0xff,0xff,0x00,  0xff,0xff,0xff,// white, blue,yellow,white
+                0xff,0xff,0xff,  0xff,0xff,0xff,  0xff,0xff,0xff,  0xff,0xff,0xff // white,white,white, white
+            );
+
+            function mInit(){
+                // 1. - append data as a canvas element
+                var mCanvas = createImageFromRGBdata(rgbData, 4, 4);
+                mCanvas.setAttribute('style', "width:200px; height:200px; border:solid 1px black"); // make it large enough to be visible
+                document.body.appendChild( mCanvas );
+
+                // 2 - append data as a (saveable) image
+                var mImg = newEl("img");
+                var imgDataUrl = mCanvas.toDataURL();	// make a base64 string of the image data (the array above)
+                mImg.src = imgDataUrl;
+                mImg.setAttribute('style', "width:64px; height:64px; border:solid 1px black"); // make it large enough to be visible
+                document.body.appendChild(mImg);
+            }
+
+        </script>
+        <style>
+        </style>
+    </head>
+    
+    <body>
+
+    </body>
+</html>
